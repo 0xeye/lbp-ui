@@ -1,0 +1,77 @@
+fragment Bal_AllPoolToken on PoolToken {
+  id
+  address
+  symbol
+  decimals
+  name
+  balance
+  weight
+}
+
+fragment Bal_AllPool on Pool {
+  id
+  address
+  name
+  totalShares
+  totalWeight
+  totalLiquidity
+  tokens {
+    ...Bal_AllPoolToken
+  }
+}
+
+query PoolsByAddresses($addresses: [Bytes!]!) {
+  poolsByAddresses: pools(where: { address_in: $addresses }) {
+    ...Bal_AllPool
+  }
+}
+
+query BalancerLbpLatestPrice($pairId: ID!) {
+  latestPrice(id: $pairId) {
+    id
+    price
+  }
+}
+
+query BalancerLbp($address: Bytes!, $pairId: ID!) {
+  pools(where: { address: $address }) {
+    id
+    swapsCount
+    tokens {
+      id
+      symbol
+      balance
+      weight
+    }
+    holdersCount
+  }
+  latestPrice(id: $pairId) {
+    id
+    price
+    pricingAsset
+    block
+  }
+}
+
+query BalancerLbpSwaps($address: Bytes!, $lastTimestamp: Int!) {
+  pools(where: { address: $address }) {
+    id
+    swaps(
+      first: 1000,
+      orderBy: timestamp, orderDirection: asc,
+      where: { timestamp_gt: $lastTimestamp },
+    ) {
+      timestamp
+      id
+      tokenIn
+      tokenInSym
+      tokenAmountIn
+      tokenOut
+      tokenOutSym
+      tokenAmountOut
+      userAddress {
+        id
+      }
+    }
+  }
+}

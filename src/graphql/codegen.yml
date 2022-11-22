@@ -1,0 +1,51 @@
+config:
+  withHOC: false
+  withHooks: true
+  withComponent: false
+  skipTypename: true
+  scalars:
+    Address: string
+    BigInt: string
+    BigDecimal: string
+    BigNumber: "ethers#BigNumber"
+    Bytes: string
+    ID: string
+
+generates:
+  ./src/graphql/aura/schema.graphql:
+    overwrite: true
+    schema: https://api.thegraph.com/subgraphs/name/0xbutterfield/aura-kovan
+    plugins:
+      - 'schema-ast'
+    config:
+      includeDirectives: true
+
+  ./src/graphql/aura/codegen.tsx:
+    overwrite: true
+    schema:
+      - https://api.thegraph.com/subgraphs/name/0xbutterfield/aura-kovan
+    documents: './src/graphql/aura/*.graphql'
+    plugins:
+      - 'fragment-matcher'
+      - 'typescript'
+      - 'typescript-operations'
+      - 'typescript-react-apollo'
+
+  ./src/graphql/balancer/schema.graphql:
+    overwrite: true
+    schema: https://api.thegraph.com/subgraphs/name/balancer-labs/balancer-kovan-v2
+    plugins:
+      - 'schema-ast'
+    config:
+      includeDirectives: true
+
+  ./src/graphql/balancer/codegen.tsx:
+    overwrite: true
+    schema:
+      - https://api.thegraph.com/subgraphs/name/balancer-labs/balancer-kovan-v2
+    documents: './src/graphql/balancer/*.graphql'
+    plugins:
+      - 'fragment-matcher'
+      - 'typescript'
+      - 'typescript-operations'
+      - 'typescript-react-apollo'

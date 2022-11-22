@@ -1,0 +1,155 @@
+fragment AllToken on Token {
+  id
+  decimals
+  symbol
+  name
+}
+
+fragment AllPool on Pool {
+  id
+  depositToken {
+    ...AllToken
+  }
+  lpToken {
+    ...AllToken
+  }
+  isFactoryPool
+  factoryPoolData {
+    id
+    isShutdown
+    stash
+    gauge
+  }
+  rewardPool
+  rewardData {
+    id
+    token {
+      ...AllToken
+    }
+    periodFinish
+    lastUpdateTime
+    rewardPerTokenStored
+    rewardRate
+  }
+  totalSupply
+  totalStaked
+}
+
+fragment AllPoolAccount on PoolAccount {
+  id
+  balance
+  staked
+  rewards
+  rewardPerTokenPaid
+}
+
+fragment AllAuraLocker on AuraLocker {
+  id
+  address
+  lockedSupply
+  totalLocked: totalSupply
+  rewardData {
+    id
+    token {
+      ...AllToken
+    }
+    periodFinish
+    lastUpdateTime
+    rewardPerTokenStored
+    rewardRate
+  }
+}
+
+query AuraStatic {
+  global(id: "global") {
+    id
+    aura
+    auraTotalSupply
+    auraMaxSupply
+    auraReductionPerCliff
+    auraTotalCliffs
+  }
+  masterChefs {
+    id
+    endBlock
+    startBlock
+    totalAllocPoint
+    rewardPerBlock
+  }
+  tokens {
+    ...AllToken
+  }
+}
+
+query MerkleDrops($accountId: String!, $hasAccount: Boolean!) {
+  merkleDrops {
+    id
+    startTime
+    expiryTime
+    merkleRoot
+    claims(where: { account: $accountId }) @include(if: $hasAccount) {
+      id
+      amount
+      locked
+    }
+  }
+}
+
+query Aura($accountId: String!, $hasAccount: Boolean!) {
+  auraLocker(id: "auraLocker") {
+    ...AllAuraLocker
+    accounts(where: { account: $accountId }) @include(if: $hasAccount) {
+      id
+      balance
+      balanceLocked
+      balanceNextUnlockIndex
+      userLocks {
+        id
+        amount
+        unlockTime
+      }
+      userData {
+        id
+        token {
+          ...AllToken
+        }
+        rewards
+        rewardPerTokenPaid
+      }
+    }
+  }
+  auraBal: pool(id: "auraBal") {
+    ...AllPool
+    accounts(where: { account: $accountId }) @include(if: $hasAccount) {
+      ...AllPoolAccount
+    }
+  }
+  initialAuraBal: pool(id: "initialAuraBalRewards") {
+    ...AllPool
+    accounts(where: { account: $accountId }) @include(if: $hasAccount) {
+      ...AllPoolAccount
+    }
+  }
+  factoryPools: pools(where: { isFactoryPool: true }) {
+    ...AllPool
+    accounts(where: { account: $accountId }) @include(if: $hasAccount) {
+      ...AllPoolAccount
+    }
+  }
+  masterChefPoolInfos {
+    id
+    accCvxPerShare
+    allocPoint
+    lastRewardBlock
+    rewarder
+    lpToken {
+      ...AllToken
+    }
+    lpSupply
+    userInfos(where: { account: $accountId }) @include(if: $hasAccount) {
+      id
+      amount
+      rewardDebt
+    }
+  }
+}

@@ -1,0 +1,23 @@
+projects:
+  aura:
+    name: "Balancer Subgraph"
+    schemaPath: "./schema.graphql"
+    extensions:
+      endpoints:
+        mainnet:
+          url: "https://api.thegraph.com/subgraphs/name/balancer-labs/balancer-v2"
+          headers:
+            "user-agent": "JS GraphQL"
+          introspect: false
+
+        rinkeby:
+          url: "https://api.thegraph.com/subgraphs/name/balancer-labs/balancer-rinkeby-v2"
+          headers:
+            "user-agent": "JS GraphQL"
+          introspect: false
+
+        kovan:
+          url: "https://api.thegraph.com/subgraphs/name/balancer-labs/balancer-kovan-v2"
+          headers:
+            "user-agent": "JS GraphQL"
+          introspect: false
